@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"context"
@@ -25,7 +25,7 @@ const SCHEDULE_COLLECTION_NAME = "schedule"
 		02 disconnect from mongo atlas cluster
 
 	*Functionalities
-		01 Draftman CRUD
+		01 d.Draftman CRUD
 		02 Schedule CRUD
 
 
@@ -35,7 +35,7 @@ const SCHEDULE_COLLECTION_NAME = "schedule"
 */
 
 //DB 01
-func connectToDB() (*mongo.Client, context.Context,
+func ConnectToDB() (*mongo.Client, context.Context,
 	context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(CONNECTION_STRING))
@@ -43,7 +43,7 @@ func connectToDB() (*mongo.Client, context.Context,
 }
 
 //DB 02
-func closeDBClient(c *mongo.Client, ctx context.Context, cancel context.CancelFunc) {
+func CloseDBClient(c *mongo.Client, ctx context.Context, cancel context.CancelFunc) {
 	defer cancel()
 
 	defer func() {
@@ -55,7 +55,7 @@ func closeDBClient(c *mongo.Client, ctx context.Context, cancel context.CancelFu
 
 //*Functionalities 01
 //readOne
-func getOneDraftmanById(c *mongo.Client, ctx context.Context, id string) (*Draftman, error) {
+func GetOneDraftmanById(c *mongo.Client, ctx context.Context, id string) (*Draftman, error) {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 	var res bson.M
 	err := collection.FindOne(ctx, primitive.M{"_id": id}).Decode(&res)
@@ -74,7 +74,7 @@ func getOneDraftmanById(c *mongo.Client, ctx context.Context, id string) (*Draft
 }
 
 //readAll
-func getDraftmanList(c *mongo.Client, ctx context.Context, limit int) ([]Draftman, error) {
+func GetDraftmanList(c *mongo.Client, ctx context.Context, limit int) ([]Draftman, error) {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 	findOptions := options.Find()
 	findOptions.SetLimit(int64(limit))
@@ -97,7 +97,7 @@ func getDraftmanList(c *mongo.Client, ctx context.Context, limit int) ([]Draftma
 }
 
 //insertOne
-func insertNewDraftMan(c *mongo.Client, ctx context.Context, d Draftman) (string, error) {
+func InsertNewDraftMan(c *mongo.Client, ctx context.Context, d Draftman) (string, error) {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 	if res, err := collection.InsertOne(ctx, d); err != nil {
 		return "", err
@@ -108,7 +108,7 @@ func insertNewDraftMan(c *mongo.Client, ctx context.Context, d Draftman) (string
 }
 
 //updateOne
-func updateDraftmanById(c *mongo.Client, ctx context.Context, d *Draftman) error {
+func UpdateDraftmanById(c *mongo.Client, ctx context.Context, d *Draftman) error {
 
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 
@@ -122,7 +122,7 @@ func updateDraftmanById(c *mongo.Client, ctx context.Context, d *Draftman) error
 }
 
 //deleteOne
-func deleteDraftmanById(c *mongo.Client, ctx context.Context, id string) error {
+func DeleteDraftmanById(c *mongo.Client, ctx context.Context, id string) error {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 
 	if _, err := collection.DeleteOne(ctx, primitive.M{"_id": id}); err != nil {
@@ -135,7 +135,7 @@ func deleteDraftmanById(c *mongo.Client, ctx context.Context, id string) error {
 //*Functionalities 02
 
 //insertOne
-func insertNewSchedule(c *mongo.Client, ctx context.Context, s Schedule) (string, error) {
+func InsertNewSchedule(c *mongo.Client, ctx context.Context, s Schedule) (string, error) {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 	if res, err := collection.InsertOne(ctx, s); err != nil {
 		return "", err
@@ -146,7 +146,7 @@ func insertNewSchedule(c *mongo.Client, ctx context.Context, s Schedule) (string
 }
 
 //updateOne
-func updateScheduleById(c *mongo.Client, ctx context.Context, s *Schedule) error {
+func UpdateScheduleById(c *mongo.Client, ctx context.Context, s *Schedule) error {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 	replacement := bson.M{"$set": s}
 
@@ -158,7 +158,7 @@ func updateScheduleById(c *mongo.Client, ctx context.Context, s *Schedule) error
 }
 
 // deleteOne
-func deleteScheduleById(c *mongo.Client, ctx context.Context, id string) error {
+func DeleteScheduleById(c *mongo.Client, ctx context.Context, id string) error {
 	collection := c.Database(DB_NAME).Collection(DRAFTMAN_COLLECTION_NAME)
 	if _, err := collection.DeleteOne(ctx, primitive.M{"_id": id}); err != nil {
 		return err
